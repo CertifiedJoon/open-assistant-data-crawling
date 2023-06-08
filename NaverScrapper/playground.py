@@ -14,7 +14,7 @@ class WordLocator:
     self._root = url
     self._all_webpages = [] # list of urls
     self._located_webpages = []
-    self._located
+    self._located = []
 
   def _locate(self, word : str):
     """

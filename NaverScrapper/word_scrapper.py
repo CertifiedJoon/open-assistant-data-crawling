@@ -12,6 +12,8 @@ class WordLocator:
     self._wb = Workbook()
     self._locate = []
     self._located_webpages = []
+    self._crawled = set(url[:-1] for url in open(f"NaverScrapper/result/txt_located.txt", "r",  encoding="utf-8").readlines())
+    
 
   def crawl(self, start):
     """
@@ -51,33 +53,31 @@ class WordLocator:
         print(url if url.startswith(self._root) else self._root + url)
         f_located.write(url + "\n")
         instruction = instruction.get_text().strip()
-        responses = soup.find_all("div", class_="se-module-text")
-        for response in responses:
-          response_spans = response.find_all("span")
-          txt = ""
-          for response_span in response_spans:
-            txt += response_span.get_text()
-          
-          print(f'============================\n\n{instruction}\n\n{txt}\n\n')
-          cnt += 1
-          sheet.append([instruction, txt, 'Naver Kin', ''])
+        if not instruction[0].isnumeric():
+          responses = soup.find_all("div", class_="se-module-text")
+          for response in responses:
+            response_spans = response.find_all("span")
+            txt = ""
+            for response_span in response_spans:
+              txt += response_span.get_text()
+            
+            print(f'============================\n\n{instruction}\n\n{txt}\n\n')
+            cnt += 1
+            sheet.append([instruction, txt, 'Naver Kin', url])
+            self._wb.save(filename)
 
       # find all valid neighbor and add to queue
       for link in soup.find_all('a'):
         neighbor = link.get('href')
-        if neighbor.startswith('/qna/detail.naver?d1id='):
+        if neighbor and neighbor.startswith('/qna/detail.naver?d1id='):
           neighbor = self._root + neighbor
           # must consider relative and absolute routing.
-          if neighbor not in visited:
+          if neighbor not in visited and neighbor not in self._crawled:
             q.append(neighbor)
-        if neighbor.startswith('/qna/list.naver?') and neighbor[-2:] not in visited_index:
+        elif neighbor and neighbor.startswith('/qna/list.naver?') and neighbor[-2:] not in visited_index:
           neighbor = self._root + neighbor
-
-          if neighbor[-2:] not in visited_index:
-            visited_index.add(neighbor[-2:])
-            q.append(neighbor)
-    
-    self._wb.save(filename)
+          visited_index.add(neighbor[-2:])
+          q.append(neighbor)
     
 
 if __name__ == '__main__':

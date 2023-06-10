@@ -24,7 +24,7 @@ class WordLocator:
     """
     sheet = self._wb.active
     sheet.append(['Instruction', 'Response', 'Source', 'MetaData'])
-    filename = "NaverScrapper/result/__crawled_data.xlsx"
+    filename = f"NaverScrapper/result/{datetime.datetime.today().strftime('%Y-%m-%d')}__crawled_data.xlsx"
     f_located = open(f"NaverScrapper/result/txt_located.txt", "a",  encoding="utf-8")
 
     q = deque()

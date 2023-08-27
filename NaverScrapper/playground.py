@@ -1,1 +1,0 @@
-print(set(url[:-1] for url in open(f"NaverScrapper/result/txt_located.txt", "r",  encoding="utf-8").readlines()))
